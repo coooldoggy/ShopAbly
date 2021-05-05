@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ShopAbly</string>
+    <string name="bottom_nav_home">홈</string>
+    <string name="bottom_nav_zzim">좋아요</string>
 </resources>
