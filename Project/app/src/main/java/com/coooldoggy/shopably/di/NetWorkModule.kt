@@ -1,11 +1,14 @@
-package com.coooldoggy.shopably.data.api
+package com.coooldoggy.shopably.di
 
 import com.coooldoggy.shopably.BASE_API_URL
 import com.coooldoggy.shopably.BuildConfig
-import com.coooldoggy.shopably.ShopApplication
+import com.coooldoggy.shopably.data.api.ShopApiHelper
+import com.coooldoggy.shopably.data.api.ShopApiHelperImpl
+import com.coooldoggy.shopably.data.service.ShopApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -13,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ShopApplication::class)
+@InstallIn(SingletonComponent::class)
 object NetWorkModule {
     private val TAG = NetWorkModule::class.java.simpleName
 
@@ -27,11 +30,11 @@ object NetWorkModule {
 
     @Provides
     @Singleton
-    fun provideApiHelper(shopApiHelper: ShopApiHelper): ShopApiHelper = shopApiHelper
+    fun provideApiService(retrofit: Retrofit) = retrofit.create(ShopApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit) = retrofit.create(ShopServiceApi::class.java)
+    fun provideApiHelper(shopApiHelperImpl: ShopApiHelperImpl): ShopApiHelper = shopApiHelperImpl
 
     @Singleton
     @Provides

@@ -1,18 +1,21 @@
 package com.coooldoggy.shopably.ui.view
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.coooldoggy.shopably.R
 import com.coooldoggy.shopably.databinding.ActivityMainBinding
+import com.coooldoggy.shopably.ui.viewmodel.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    lateinit var mainViewBinding: ActivityMainBinding
+    private lateinit var mainViewBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
