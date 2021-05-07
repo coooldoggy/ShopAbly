@@ -107,6 +107,7 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                             Log.d(TAG, "onPageSelectedListener : $position / $realPosition")
                             holder.positionViewPager2Indicator = position
                             holder.realPositionViewPager2 = realPosition
+                            holder.indicator.text = "${position + 1}/${bannerList.bannerItem?.size}"
                         }
                     }
 

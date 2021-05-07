@@ -12,6 +12,7 @@ class BannerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var positionViewPager2Indicator = 0
     var binding: ItemImageBannerBinding = ItemImageBannerBinding.bind(view)
     var viewPager: ViewPager2? = binding.vp
+    var indicator = binding.tvIndicator
 
     init {
         infiniteLoopViewPager2Helper = InfiniteLoopViewPager2Helper(binding.vp)
