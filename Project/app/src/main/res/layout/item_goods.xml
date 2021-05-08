@@ -4,17 +4,23 @@
         <variable
             name="model"
             type="com.coooldoggy.shopably.data.Goods" />
+        <import type="android.view.View"/>
+        <variable
+            name="isFavorite"
+            type="Boolean" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:minWidth="162dp"
+    android:minHeight="297dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/iv_goods"
         imageUrl="@{model.image}"
         app:layout_constraintDimensionRatio="w,1:1.2"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,6 +29,7 @@
 
     <ImageView
         android:id="@+id/iv_favorite"
+        selected="@{isFavorite}"
         android:src="@drawable/bottom_nav_zzim_selector"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
@@ -46,7 +53,7 @@
 
     <TextView
         android:id="@+id/tv_price"
-        android:text="@{model.price}"
+        price="@{model.price}"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_sale_percent"
@@ -55,7 +62,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <TextView
+        android:id="@+id/tv_name"
+        android:text="@{model.name}"
+        android:textSize="11sp"
+        android:textColor="@color/brownish_grey"
+        app:layout_constraintTop_toBottomOf="@+id/tv_price"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="9dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:maxWidth="146dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
+    <ImageView
+        android:id="@+id/iv_new"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="@{model.new ? View.VISIBLE : View.GONE}"
+        android:paddingEnd="5dp"
+        android:src="@drawable/img_badge_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_sell_count"
+        sellCount="@{model.sellCount}"
+        app:layout_constraintStart_toEndOf="@id/iv_new"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

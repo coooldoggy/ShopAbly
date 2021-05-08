@@ -7,6 +7,7 @@ buildscript {
     ext.coroutines_version = "1.4.1"
     ext.glide_version = '4.11.0'
     ext.hilt_version = '2.35'
+    ext.room_version = '2.2.6'
     
     repositories {
         google()

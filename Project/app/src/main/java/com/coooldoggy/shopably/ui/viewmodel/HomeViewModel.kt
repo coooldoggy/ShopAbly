@@ -18,6 +18,7 @@ class HomeViewModel @Inject constructor(
     val shopItemList: LiveData<ShopApiResponse>
         get() = _shopItemList
     val isLoadMore = MutableLiveData<Boolean>(false)
+    val adapter = HomeListAdapter()
 
     init {
         getShopItems()

@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.coooldoggy.shopably.R
 import com.coooldoggy.shopably.data.Banner
+import com.coooldoggy.shopably.data.FavoriteEntity
+import com.coooldoggy.shopably.data.Goods
 import com.coooldoggy.shopably.data.ShopApiResponse
 import com.coooldoggy.shopably.databinding.ItemImageBannerSlideItemBinding
 import com.coooldoggy.shopably.ui.common.InfiniteLoopViewPager2Helper
@@ -22,17 +24,25 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val VIEW_TYPE_ITEM = 2
     }
 
+    interface ItemClick {
+        fun onClick(view: View, data: Goods, position: Int)
+    }
+
     var itemList = ArrayList<HomeListItem>()
+    var favList = ArrayList<Goods>()
+    var favClick: ItemClick? = null
 
     fun setData(resultList: ShopApiResponse, isLoadMore: Boolean) {
         val currentItemCount = itemList.size
         val bannerItem = HomeListItem.BannerItem()
         bannerItem.bannerItem = resultList.banners
-        val shopItem = HomeListItem.ShopItem()
-        shopItem.shopItem = resultList.goods
-
         itemList.add(bannerItem)
-        itemList.add(shopItem)
+        resultList.goods.forEach {
+            itemList.add(HomeListItem.ShopItem().apply {
+                shopItem = it
+            })
+        }
+
         if (isLoadMore){
             notifyItemRangeInserted(currentItemCount, itemList.size)
         }else{
@@ -61,12 +71,8 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 return BannerViewHolder(view)
             }
             VIEW_TYPE_ITEM -> {
-                val view = layoutInflater.inflate(R.layout.item_image_banner, parent, false)
-                return BannerViewHolder(view)
-            }
-            VIEW_TYPE_EMPTY -> {
-                val view = layoutInflater.inflate(R.layout.item_image_banner, parent, false)
-                return BannerViewHolder(view)
+                val view = layoutInflater.inflate(R.layout.item_goods, parent, false)
+                return GoodsViewHolder(view)
             }
             else -> {
                 val view = layoutInflater.inflate(R.layout.item_image_banner, parent, false)
@@ -104,7 +110,6 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                     holder.infiniteLoopViewPager2Helper?.onPageSelectedListener = object: InfiniteLoopViewPager2Helper.OnPageSelectedListener{
                         override fun onPageSelectedListener(position: Int, realPosition: Int) {
-                            Log.d(TAG, "onPageSelectedListener : $position / $realPosition")
                             holder.positionViewPager2Indicator = position
                             holder.realPositionViewPager2 = realPosition
                             holder.indicator.text = "${position + 1}/${bannerList.bannerItem?.size}"
@@ -119,7 +124,29 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     }
                 }
             }
+            VIEW_TYPE_ITEM -> {
+                val itemHolder = (holder as GoodsViewHolder)
+                val goods: HomeListItem.ShopItem = itemList[position] as HomeListItem.ShopItem
+                goods.shopItem?.let { goods ->
+                    itemHolder.favoriteBtn.apply {
+                        setOnClickListener {
+                            favClick?.onClick(it, goods, position)
+                        }
+                    }
+                    itemHolder.bind(goods, isFavorite(goods))
+                }
+            }
         }
+    }
+
+    private fun isFavorite(goods: Goods): Boolean{
+        var isFavorite = false
+        favList.forEach {
+            if (it.id == goods.id) {
+                isFavorite = true
+            }
+        }
+        return isFavorite
     }
 
     override fun getItemCount(): Int {
@@ -127,17 +154,23 @@ class HomeListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        (holder as BannerViewHolder).infiniteLoopViewPager2Helper?.startAutoScroll()
+        if (holder is BannerViewHolder){
+            holder.infiniteLoopViewPager2Helper?.startAutoScroll()
+        }
     }
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        (holder as BannerViewHolder).infiniteLoopViewPager2Helper?.stopAutoScroll()
+        if (holder is BannerViewHolder){
+            holder.infiniteLoopViewPager2Helper?.stopAutoScroll()
+        }
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        (holder as BannerViewHolder).infiniteLoopViewPager2Helper?.let{
-            it.onPageSelectedListener = null
-            it.clear()
+        if (holder is BannerViewHolder){
+            holder.infiniteLoopViewPager2Helper?.let{
+                it.onPageSelectedListener = null
+                it.clear()
+            }
         }
     }
 
