@@ -1,25 +1,34 @@
-package com.coooldoggy.shopably.ui
+package com.coooldoggy.shopably.ui.view
 
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.coooldoggy.shopably.R
-import com.coooldoggy.shopably.ui.common.IAdapterDelegate
+import com.coooldoggy.shopably.data.ShopApiResponse
+import com.coooldoggy.shopably.ui.HomeListItem
+import com.coooldoggy.shopably.ui.TopImageBannerViewPagerAdapter
 import com.coooldoggy.shopably.ui.common.InfiniteLoopViewPager2Helper
 
-class BannerDelegate: IAdapterDelegate<BannerViewHolder, HomeListItem.BannerItem> {
-    private val TAG = BannerDelegate::class.java.simpleName
+class BannerListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>()  {
+    var bannerList = ArrayList<HomeListItem.BannerItem>()
 
-    override fun onCreateViewHolder(context: Context?, parent: ViewGroup, viewType: Int): BannerViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_image_banner, parent, false)
+    fun setData(response: ShopApiResponse){
+        val bannerItem = HomeListItem.BannerItem()
+        bannerItem.bannerItem = response.banners
+        bannerList.add(bannerItem)
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val view = layoutInflater.inflate(R.layout.item_image_banner, parent, false)
         return BannerViewHolder(view)
     }
 
-    override fun onBindViewHolder(context: Context?, holder: BannerViewHolder, cardItem: HomeListItem.BannerItem, position: Int) {
-        val bannerList: HomeListItem.BannerItem = cardItem
-        holder.viewPager?.let{ vp2 ->
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val bannerList: HomeListItem.BannerItem = bannerList[position]
+        val bannerHolder = holder as BannerViewHolder
+        bannerHolder.viewPager?.let{ vp2 ->
             val (firstPosition, items) = holder.
             infiniteLoopViewPager2Helper?.generateLoopItem(bannerList.bannerItem ?: emptyList())
                 ?: 0 to emptyList()
@@ -34,7 +43,7 @@ class BannerDelegate: IAdapterDelegate<BannerViewHolder, HomeListItem.BannerItem
             }else{
                 true
             }
-            Log.d(TAG, "ifNeedInit $ifNeedInit")
+
             if (ifNeedInit){
                 vp2.adapter = TopImageBannerViewPagerAdapter(items)
                 holder.realPositionViewPager2 = firstPosition
@@ -58,16 +67,23 @@ class BannerDelegate: IAdapterDelegate<BannerViewHolder, HomeListItem.BannerItem
         }
     }
 
-    override fun onViewAttachedToWindow(holder: BannerViewHolder) {
-        holder.infiniteLoopViewPager2Helper?.startAutoScroll()
+    override fun getItemCount(): Int {
+        return bannerList.size
     }
 
-    override fun onViewDetachedFromWindow(holder: BannerViewHolder) {
-        holder.infiniteLoopViewPager2Helper?.stopAutoScroll()
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        val bannerHolder = holder as BannerViewHolder
+        bannerHolder.infiniteLoopViewPager2Helper?.startAutoScroll()
     }
 
-    override fun onViewRecycled(holder: BannerViewHolder) {
-        holder.infiniteLoopViewPager2Helper?.let{
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        val bannerHolder = holder as BannerViewHolder
+        bannerHolder.infiniteLoopViewPager2Helper?.stopAutoScroll()
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        val bannerHolder = holder as BannerViewHolder
+        bannerHolder.infiniteLoopViewPager2Helper?.let{
             it.onPageSelectedListener = null
             it.clear()
         }

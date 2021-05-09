@@ -5,30 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridLayout
-import androidx.databinding.DataBindingUtil
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.coooldoggy.shopably.R
 import com.coooldoggy.shopably.data.Goods
 import com.coooldoggy.shopably.databinding.FragmentHomeBinding
-import com.coooldoggy.shopably.ui.BannerViewHolder
-import com.coooldoggy.shopably.ui.GoodsViewHolder
-import com.coooldoggy.shopably.ui.HomeListAdapter
-import com.coooldoggy.shopably.ui.HomeListAdapter.Companion.VIEW_TYPE_BANNER
-import com.coooldoggy.shopably.ui.HomeListAdapter.Companion.VIEW_TYPE_ITEM
 import com.coooldoggy.shopably.ui.HomeListItem
 import com.coooldoggy.shopably.ui.viewmodel.FavoriteViewModel
 import com.coooldoggy.shopably.ui.viewmodel.HomeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 class HomeFragment: Fragment() {
     private val TAG = HomeFragment::class.java.simpleName
@@ -47,41 +35,56 @@ class HomeFragment: Fragment() {
     }
 
     private fun setResources(){
-        val gridLayoutManager = GridLayoutManager(context, 2)
-        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when(dataBinding.rvHome.findViewHolderForLayoutPosition(position)) {
-                    is BannerViewHolder -> 1
-                    is GoodsViewHolder -> 2
-                    else -> 2
-                }
-            }
-        }
-
         dataBinding.swRefresh.setOnRefreshListener {
             viewModel.refresh()
         }
 
-        dataBinding.rvHome.apply {
-            layoutManager = gridLayoutManager
-            adapter = viewModel.adapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener(){
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if(!recyclerView.canScrollVertically(1)) {
-//                        viewModel.getMoreItems()
+        dataBinding.rvShop.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = viewModel.shopAdapter.apply {
+                itemClick = object : GoodsListAdapter.ItemClick{
+                    override fun onClick(data: Goods) {
+                        favViewModel.reverseDataStatus(data)
                     }
                 }
-            })
+            }
+            addOnScrollListener(rvScrollListener)
         }
 
-        viewModel.shopItemList.observe(viewLifecycleOwner, Observer {
-            viewModel.adapter.setData(it, viewModel.isLoadMore.value ?: false)
+        dataBinding.rvBanner.apply{
+            layoutManager = LinearLayoutManager(context)
+            adapter = viewModel.bannerAdapter
+        }
+
+        viewModel.shopItemList.observe(viewLifecycleOwner, Observer { shopItem ->
+            val loadMore = viewModel.isLoadMore.value ?: false
+                if (loadMore){
+                    viewModel.shopAdapter.setData(shopItem, loadMore)
+                }else{
+                    viewModel.bannerAdapter.setData(shopItem)
+                    viewModel.shopAdapter.setData(shopItem, loadMore)
+                }
         })
 
         viewModel.eventId.observe(viewLifecycleOwner, Observer {
             when(it.peekContent()){
                 HomeViewModel.EVENT_REFRESH_DONE -> dataBinding.swRefresh.isRefreshing = false
+                HomeViewModel.EVENT_NOMORE_ITEM -> Toast.makeText(context, "마지막 상품입니다.", Toast.LENGTH_SHORT).show()
             }
         })
+
+        favViewModel.favItemList.observe(viewLifecycleOwner, Observer {
+            viewModel.shopAdapter.favoriteList = it
+            viewModel.shopAdapter.notifyDataSetChanged()
+        })
+    }
+
+    private val rvScrollListener = object : RecyclerView.OnScrollListener(){
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            val manager = recyclerView.layoutManager as GridLayoutManager
+            if (manager.itemCount <= manager.findLastCompletelyVisibleItemPosition() + 2){
+                viewModel.loadMoreItems()
+            }
+        }
     }
 }

@@ -12,15 +12,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="12dp"
-    android:minWidth="162dp"
-    android:minHeight="297dp"
+    android:layout_margin="12dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/iv_goods"
         imageUrl="@{model.image}"
-        app:layout_constraintDimensionRatio="w,1:1.2"
+        app:layout_constraintDimensionRatio="1:1.2"
+        android:background="@drawable/imageview_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -44,6 +43,8 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_goods"
         app:layout_constraintLeft_toLeftOf="parent"
         android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:layout_marginTop="8dp"
         originalPrice="@{model.actualPrice}"
         salePrice="@{model.price}"
         android:textColor="@color/watermelon"
@@ -55,6 +56,8 @@
         android:id="@+id/tv_price"
         price="@{model.price}"
         android:textSize="18sp"
+        android:layout_marginTop="8dp"
+        android:includeFontPadding="false"
         android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_sale_percent"
         app:layout_constraintTop_toBottomOf="@+id/iv_goods"
@@ -89,6 +92,9 @@
 
     <TextView
         android:id="@+id/tv_sell_count"
+        android:textSize="11sp"
+        android:textColor="@color/brownish_grey"
+        android:includeFontPadding="false"
         sellCount="@{model.sellCount}"
         app:layout_constraintStart_toEndOf="@id/iv_new"
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
