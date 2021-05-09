@@ -11,7 +11,7 @@ sealed class HomeListItem: Serializable {
     }
 
     class ShopItem: HomeListItem(){
-        var shopItem: Goods? = null
+        var shopItem:  Goods? = null
     }
 
     class EmptyItem : HomeListItem() {}

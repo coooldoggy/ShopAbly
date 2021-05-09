@@ -6,7 +6,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.coooldoggy.shopably.databinding.ItemImageBannerBinding
 import com.coooldoggy.shopably.ui.common.InfiniteLoopViewPager2Helper
 
-class BannerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class BannerViewHolder(view: View) : HomeListAdapter.Holder(view) {
     var infiniteLoopViewPager2Helper: InfiniteLoopViewPager2Helper? = null
     var realPositionViewPager2 = 0
     var positionViewPager2Indicator = 0

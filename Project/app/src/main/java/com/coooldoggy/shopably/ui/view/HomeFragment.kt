@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.coooldoggy.shopably.R
 import com.coooldoggy.shopably.data.Goods
 import com.coooldoggy.shopably.databinding.FragmentHomeBinding
@@ -46,25 +47,10 @@ class HomeFragment: Fragment() {
     }
 
     private fun setResources(){
-        dataBinding.rvHome.adapter = viewModel.adapter.apply {
-            favClick = object: HomeListAdapter.ItemClick{
-                override fun onClick(view: View, data: Goods, position: Int) {
-                    lifecycleScope.launch {
-                        val isExist = favViewModel.isFavorite(data).await()
-                        if (isExist){
-                            favViewModel.deleteFavorite(data)
-                        }else{
-                            favViewModel.insertFavorite(data)
-                        }
-                    }
-                }
-            }
-        }
-
         val gridLayoutManager = GridLayoutManager(context, 2)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when(dataBinding.rvHome.findViewHolderForAdapterPosition(position)) {
+                return when(dataBinding.rvHome.findViewHolderForLayoutPosition(position)) {
                     is BannerViewHolder -> 1
                     is GoodsViewHolder -> 2
                     else -> 2
@@ -72,19 +58,30 @@ class HomeFragment: Fragment() {
             }
         }
 
+        dataBinding.swRefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
         dataBinding.rvHome.apply {
             layoutManager = gridLayoutManager
-            setHasFixedSize(true)
+            adapter = viewModel.adapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if(!recyclerView.canScrollVertically(1)) {
+//                        viewModel.getMoreItems()
+                    }
+                }
+            })
         }
 
         viewModel.shopItemList.observe(viewLifecycleOwner, Observer {
-            val adapter = dataBinding.rvHome.adapter
-            (adapter as HomeListAdapter).setData(it, viewModel.isLoadMore.value ?: false)
+            viewModel.adapter.setData(it, viewModel.isLoadMore.value ?: false)
         })
 
-        favViewModel.favItemList.observe(viewLifecycleOwner, Observer {
-            val adapter = dataBinding.rvHome.adapter
-            (adapter as HomeListAdapter).favList = it
+        viewModel.eventId.observe(viewLifecycleOwner, Observer {
+            when(it.peekContent()){
+                HomeViewModel.EVENT_REFRESH_DONE -> dataBinding.swRefresh.isRefreshing = false
+            }
         })
     }
 }
