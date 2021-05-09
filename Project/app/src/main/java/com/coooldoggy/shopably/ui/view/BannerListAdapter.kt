@@ -19,6 +19,10 @@ class BannerListAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>()  {
         notifyDataSetChanged()
     }
 
+    fun clearData(){
+        bannerList.clear()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val view = layoutInflater.inflate(R.layout.item_image_banner, parent, false)

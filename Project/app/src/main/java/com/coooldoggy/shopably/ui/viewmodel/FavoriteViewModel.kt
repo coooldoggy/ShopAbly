@@ -26,6 +26,9 @@ class FavoriteViewModel @Inject constructor(
     private val _favItemList = MutableLiveData<ArrayList<Goods>>()
     val favItemList: LiveData<ArrayList<Goods>>
         get() = _favItemList
+    private val _deletedItem = MutableLiveData<ViewModelEvent<Goods>>()
+    val deletedItem : LiveData<ViewModelEvent<Goods>>
+        get() = _deletedItem
 
     init{
         getAllFavorite()
@@ -77,6 +80,7 @@ class FavoriteViewModel @Inject constructor(
                 homeRepository.deleteFavorite(goods.id)
                 getAllFavorite()
             }
+            _deletedItem.postValue(ViewModelEvent(goods))
         }
     }
 

@@ -27,20 +27,20 @@ class HomeViewModel @Inject constructor(
         get() = _eventId
 
     init {
-        getShopItems()
+        getShopItems(false)
     }
 
     companion object{
         const val EVENT_REFRESH_DONE = 1001
-        const val EVENT_NOMORE_ITEM = 1002
     }
 
-    private fun getShopItems(){
+    private fun getShopItems(isRefresh: Boolean){
         viewModelScope.launch {
             kotlin.runCatching {
                 homeRepository.getShopItems().let {
                     if(it.isSuccessful){
                         _shopItemList.postValue(it.body())
+                        _eventId.postValue(ViewModelEvent(EVENT_REFRESH_DONE))
                     }else{
                         Log.d(TAG, "${it.errorBody()}")
                     }
@@ -56,7 +56,6 @@ class HomeViewModel @Inject constructor(
                 homeRepository.loadMoreShopItems(lastId).let {
                     if(it.isSuccessful){
                         if (it.body()?.goods?.isEmpty() == true){
-                            _eventId.postValue(ViewModelEvent(EVENT_NOMORE_ITEM))
                             return@launch
                         }
                         isLoadMore.postValue(true)
@@ -70,7 +69,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refresh(){
-//        getShopItems()
-//        _eventId.postValue(ViewModelEvent(EVENT_REFRESH_DONE))
+        shopAdapter.clearData()
+        bannerAdapter.clearData()
+        getShopItems(true)
     }
 }

@@ -14,6 +14,17 @@ class FavoriteAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun onClick(data: Goods)
     }
 
+    fun setStatusChange(goods: Goods){
+        var deletedIndex = -1
+        favoriteList.forEachIndexed { index, favItem ->
+            if (favItem == goods){
+                deletedIndex = index
+                return@forEachIndexed
+            }
+        }
+        notifyItemChanged(deletedIndex)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_goods, parent, false)
