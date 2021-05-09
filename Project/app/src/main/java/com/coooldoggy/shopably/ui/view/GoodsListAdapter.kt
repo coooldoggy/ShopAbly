@@ -17,6 +17,17 @@ class GoodsListAdapter:  RecyclerView.Adapter<RecyclerView.ViewHolder>()   {
         fun onClick(data: Goods)
     }
 
+    fun setStatusChange(goods: Goods){
+        var deletedIndex = -1
+        goodsList.forEachIndexed { index, shopItem ->
+            if (shopItem.shopItem == goods){
+                deletedIndex = index
+                return@forEachIndexed
+            }
+        }
+        notifyItemChanged(deletedIndex)
+    }
+
     fun setData(response: ShopApiResponse, isLoadMore: Boolean){
         val currentItemCount = goodsList.size
         response.goods.forEach {
@@ -30,6 +41,10 @@ class GoodsListAdapter:  RecyclerView.Adapter<RecyclerView.ViewHolder>()   {
         }else{
             notifyDataSetChanged()
         }
+    }
+
+    fun clearData(){
+        goodsList.clear()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

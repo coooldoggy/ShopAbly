@@ -48,12 +48,19 @@ class HomeFragment: Fragment() {
                     }
                 }
             }
-            addOnScrollListener(rvScrollListener)
         }
 
         dataBinding.rvBanner.apply{
             layoutManager = LinearLayoutManager(context)
             adapter = viewModel.bannerAdapter
+        }
+
+        dataBinding.sv.viewTreeObserver.addOnScrollChangedListener {
+            val view = dataBinding.sv.getChildAt(dataBinding.sv.childCount - 1)
+            val diff = view.bottom - (dataBinding.sv.height + dataBinding.sv.scrollY)
+            if (diff == 0){
+                viewModel.loadMoreItems()
+            }
         }
 
         viewModel.shopItemList.observe(viewLifecycleOwner, Observer { shopItem ->
@@ -69,22 +76,15 @@ class HomeFragment: Fragment() {
         viewModel.eventId.observe(viewLifecycleOwner, Observer {
             when(it.peekContent()){
                 HomeViewModel.EVENT_REFRESH_DONE -> dataBinding.swRefresh.isRefreshing = false
-                HomeViewModel.EVENT_NOMORE_ITEM -> Toast.makeText(context, "마지막 상품입니다.", Toast.LENGTH_SHORT).show()
             }
         })
 
         favViewModel.favItemList.observe(viewLifecycleOwner, Observer {
             viewModel.shopAdapter.favoriteList = it
-            viewModel.shopAdapter.notifyDataSetChanged()
-        })
-    }
-
-    private val rvScrollListener = object : RecyclerView.OnScrollListener(){
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            val manager = recyclerView.layoutManager as GridLayoutManager
-            if (manager.itemCount <= manager.findLastCompletelyVisibleItemPosition() + 2){
-                viewModel.loadMoreItems()
+            val deletedItem = favViewModel.deletedItem.value?.peekContent()
+            if (deletedItem != null){
+                viewModel.shopAdapter.setStatusChange(deletedItem)
             }
-        }
+        })
     }
 }
