@@ -1,6 +1,5 @@
 package com.coooldoggy.shopably.ui.common
 
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
