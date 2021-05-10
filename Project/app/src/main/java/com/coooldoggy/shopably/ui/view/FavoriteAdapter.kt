@@ -30,7 +30,6 @@ class FavoriteAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
         }
 
-        favHolder.goodsImg.clipToOutline = true
         favHolder.bind(goods, true)
     }
 

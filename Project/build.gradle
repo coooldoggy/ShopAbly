@@ -5,7 +5,7 @@ buildscript {
     ext.okhttp_version = "4.9.0"
     ext.retrofit_converter_version = "2.3.0"
     ext.coroutines_version = "1.4.1"
-    ext.glide_version = '4.11.0'
+    ext.fresco_version = '2.4.0'
     ext.hilt_version = '2.35'
     ext.room_version = '2.2.6'
     
