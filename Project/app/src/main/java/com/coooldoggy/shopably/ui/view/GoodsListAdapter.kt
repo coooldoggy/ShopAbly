@@ -61,7 +61,6 @@ class GoodsListAdapter:  RecyclerView.Adapter<RecyclerView.ViewHolder>()   {
         val shopItem = goodsList[position]
         val goodsHolder = holder as GoodsViewHolder
 
-        goodsHolder.goodsImg.clipToOutline = true
 
         shopItem.shopItem?.let{
             val goods =Goods(it.id, it.name, it.image, it.actualPrice, it.price,

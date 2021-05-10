@@ -1,28 +1,20 @@
 package com.coooldoggy.shopably.ui.common
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.view.SimpleDraweeView
 import java.text.NumberFormat
 import kotlin.math.floor
 
 object BindAdapters {
 
-    @BindingAdapter("imageUrl")
+    @BindingAdapter("frescoUrl")
     @JvmStatic
-    fun loadImage(view: ImageView, url: String) {
-        Glide.with(view.context).load(url)
-            .centerCrop()
-            .into(view)
-    }
-
-    @BindingAdapter("adapter")
-    @JvmStatic
-    fun setAdapter(view: RecyclerView, adapter: RecyclerView.Adapter<*>) {
-        view.adapter = adapter
+    fun loadImage(view: SimpleDraweeView, url: String) {
+        val controller = Fresco.newDraweeControllerBuilder().setAutoPlayAnimations(true).setUri(url).build()
+        view.controller = controller
     }
 
     @BindingAdapter("selected")
